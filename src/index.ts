@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import fileUpload from "express-fileupload";
 import logger from "morgan";
 
 import api from "./api";
@@ -15,6 +16,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload());
 
 app.use('/api', api);
 
