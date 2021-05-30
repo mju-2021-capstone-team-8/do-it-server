@@ -1,8 +1,11 @@
 import { promises as fs } from "fs";
 import { spawnSync } from "child_process";
 import { parseFile } from "music-metadata";
+import path from "path";
 
 import { Request, Response } from "express";
+
+const audioDir = path.resolve(__dirname, "..", "..", "..", "audios");
 
 export const info = (req: Request, res: Response) => {
   res.status(200).send({
@@ -10,34 +13,34 @@ export const info = (req: Request, res: Response) => {
   });
 };
 
+export const audioList = async (req: Request, res: Response) => {
+  const dir = await fs.readdir(`${audioDir}/1`, "utf-8");
+
+  res.status(200).json(dir);
+};
+
+export const upload = (req: Request, res: Response) => {
+  res.status(200).send({
+    musicFile: path.basename(req.tmpAudioPath),
+  });
+};
+
 export const renderTempo = async (req: Request, res: Response) => {
   try {
-    if (!req.files) {
-      return res.status(400).send({
-        msg: "File is not uploaded",
-      });
-    }
+    const { musicFile } = req.body;
 
-    const { tmpAudioPath, tmpOutputJsonPath } = req;
-
-    if (!tmpAudioPath || !tmpOutputJsonPath) {
-      return res.status(500).send({
-        msg: "Temporary file paths are not handled",
-      });
-    }
-
-    const duration = String((await parseFile(tmpAudioPath)).format.duration);
+    const duration = String((await parseFile(`${audioDir}/1/${musicFile}`)).format.duration);
 
     spawnSync("audiowaveform", [
       "-i",
-      tmpAudioPath,
+      `${audioDir}/1/${musicFile}`,
       "-o",
-      tmpOutputJsonPath,
+      `${audioDir}/1/${musicFile}.json`,
       "-e",
       duration,
     ]);
 
-    const audioData = String(await fs.readFile(tmpOutputJsonPath));
+    const audioData = String(await fs.readFile(`${audioDir}/1/${musicFile}.json`));
     const audioAmps = JSON.parse(audioData).data.map((a: number) =>
       Math.abs(a)
     );
@@ -62,8 +65,7 @@ export const renderTempo = async (req: Request, res: Response) => {
       }
     });
 
-    await fs.rm(tmpAudioPath);
-    await fs.rm(tmpOutputJsonPath);
+    await fs.rm(`${audioDir}/1/${musicFile}.json`);
 
     res.status(200).json({
       msg: "Successfully rendered note positions",
