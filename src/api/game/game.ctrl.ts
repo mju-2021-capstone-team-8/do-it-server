@@ -65,7 +65,7 @@ export const renderTempo = async (req: Request, res: Response) => {
       }
     });
 
-    await fs.rm(`${audioDir}/1/${musicFile}.json`);
+    await fs.unlink(`${audioDir}/1/${musicFile}.json`);
 
     res.status(200).json({
       msg: "Successfully rendered note positions",
