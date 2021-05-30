@@ -18,6 +18,12 @@ export const login = (req: Request, res: Response) => {
   });
 };
 
+export const loginOAuth = (req: Request, res: Response) => {
+  res.status(200).send({
+    msg: "OAuth Test",
+  });
+};
+
 export const edit = (req: Request, res: Response) => {
   res.status(200).json({
     msg: "Edit Test",
