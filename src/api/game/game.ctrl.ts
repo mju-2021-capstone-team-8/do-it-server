@@ -65,12 +65,18 @@ export const renderTempo = async (req: Request, res: Response) => {
       }
     });
 
+    const noteDiffTimes = [];
+    noteDiffTimes.push(noteTimes[0]);
+    for (let i = 1, l = noteTimes.length; i < l; i++) {
+      noteDiffTimes.push(noteTimes[i] - noteTimes[i - 1]);
+    }
+
     await fs.unlink(`${audioDir}/1/${musicFile}.json`);
 
     res.status(200).json({
       msg: "Successfully rendered note positions",
       duration: Math.round(parseFloat(duration)),
-      positions: noteTimes,
+      positions: noteDiffTimes,
     });
   } catch (err) {
     throw err;
