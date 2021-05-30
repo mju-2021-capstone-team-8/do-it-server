@@ -122,3 +122,6 @@ dist/
 # Temporary folders
 tmp/
 temp/
+
+# Audio files
+audios/
